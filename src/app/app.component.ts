@@ -15,31 +15,33 @@ ZoomMtg.prepareJssdk();
 export class AppComponent implements OnInit {
 
   // setup your signature endpoint here: https://github.com/zoom/websdk-sample-signature-node.js
-  signatureEndpoint = ''
-  apiKey = ''
-  meetingNumber = 123456789
-  role = 0
+  signatureEndpoint = 'https://test-zoom-integration.herokuapp.com/'
+  apiKey = 'qzyAUgofTHe2bEsk8vXh0w'
+  meetingNumber = 8102257548
+  role = 1
   leaveUrl = 'http://localhost:4200'
-  userName = 'Angular'
+  userName = 'Daily Standup Meeting'
   userEmail = ''
-  passWord = ''
-
+  passWord = '123456'
+  signature: any;
   constructor(public httpClient: HttpClient, @Inject(DOCUMENT) document) {
 
   }
 
   ngOnInit() {
-
+    this.getSignature();
   }
 
   getSignature() {
+    //alert("Entered")
     this.httpClient.post(this.signatureEndpoint, {
 	    meetingNumber: this.meetingNumber,
 	    role: this.role
     }).toPromise().then((data: any) => {
       if(data.signature) {
         console.log(data.signature)
-        this.startMeeting(data.signature)
+        this.signature = data.signature;
+        //this.startMeeting(data.signature)
       } else {
         console.log(data)
       }
@@ -47,9 +49,9 @@ export class AppComponent implements OnInit {
       console.log(error)
     })
   }
-
-  startMeeting(signature) {
-
+  
+  startMeeting() {
+    console.log("Signature = "+this.signature)
     document.getElementById('zmmtg-root').style.display = 'block'
 
     ZoomMtg.init({
@@ -59,7 +61,7 @@ export class AppComponent implements OnInit {
         console.log(success)
 
         ZoomMtg.join({
-          signature: signature,
+          signature: this.signature,
           meetingNumber: this.meetingNumber,
           userName: this.userName,
           apiKey: this.apiKey,
